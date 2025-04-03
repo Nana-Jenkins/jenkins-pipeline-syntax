@@ -22,11 +22,15 @@ pipeline {
             steps {
                 script {
                     gv = load "script.groovy"
+                    // An alternative method to enable user input (single or multi input selection???) during the actual pipeline process. Here is through env varaibles
+                    env.MYLANGUAGE  = input message: "Select preferred scripting language", ok "Done", parameters:[choice(name: 'LANGUAGE', choices: ['python', 'groovy', 'bash', 'Go-lang'], description: 'Select language')]
+
+                    echo "Preferred Language is ${MYLANGUAGE}"
                 }
             }
         }
         stage('build') {
-            input{
+            input{ // this code block enables user input (multi input selection) during the actual pipeline process.
                 message "Select final build version and preferred cloud provider"
                 ok "Done, Build Version Selected"
                 parameters{
@@ -37,10 +41,10 @@ pipeline {
             }
             steps {
 
-            script{
-                gv.buildApp()
-                echo "Final build version selection is ${'Final Build Version'}" //important to remember to enclose with quotes any variable/strings that have spaces inside. Just like was done during the variable definition above.
-                echo "Preferred cloud provider is ${Cloud_Provider}"
+                script{
+                    gv.buildApp()
+                    echo "Final build version selection is ${'Final Build Version'}" //important to remember to enclose with quotes any variable/strings that have spaces inside. Just like was done during the variable definition above. If not, it throws a syntax error during pipeline execution. However, even after enclosing in quotes, the pipeline runs and executes and you can select the options you need but when you want to call the variable in an echo/print message like this, it doesn't pick the variable value but only prints the variable name. It seems it is better to format like below, without a space 
+                    echo "Preferred cloud provider is ${Cloud_Provider}" //Better formating
 
             }
         }
