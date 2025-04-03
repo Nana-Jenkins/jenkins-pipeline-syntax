@@ -23,7 +23,7 @@ pipeline {
                 script {
                     gv = load "script.groovy"
                     // An alternative method to enable user input (single or multi input selection???) during the actual pipeline process. Here is through env varaibles
-                    env.MYLANGUAGE  = input message: "Select preferred scripting language", ok "Done", parameters:[choice(name: 'LANGUAGE', choices: ['python', 'groovy', 'bash', 'Go-lang'], description: 'Select language')]
+                    env.MYLANGUAGE = input message: "Select preferred scripting language", ok "Done", parameters: [choice(name: 'LANGUAGE', choices: ['python', 'groovy', 'bash', 'Go-lang'], description: 'Select language')]
 
                     echo "Preferred Language is ${MYLANGUAGE}"
                 }
