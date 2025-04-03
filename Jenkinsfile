@@ -26,10 +26,21 @@ pipeline {
             }
         }
         stage('build') {
+            input{
+                message "Select final build version and preferred cloud provider"
+                ok "Done, Build Version Selected"
+                parameters{
+                    choice(name: 'Final Build Version', choices: ['2.7.8', '9.5.8', '7.0.0', '3.4.5'], description: 'Select build vers.')
+                    choice(name: 'Cloud Provider', choices: ['AWS', 'GCP', 'Azure', 'DigitalOcean'], description: 'Select cloud provd.')
+
+                }
+            }
             steps {
 
             script{
                 gv.buildApp()
+                echo "Final build version selection is ${Final Build Version}"
+                echo "Preferred cloud provider is ${Cloud Provider}"
 
             }
         }
@@ -51,7 +62,7 @@ pipeline {
             }
         }
         stage('deploy') {
-            input{
+            input{ // this code block enables user input (single input selection) during the actual pipeline process.
                 message "Select the environment to deploy to"
                 ok 'Done, Environment Selected'
                 parameters {
@@ -62,7 +73,7 @@ pipeline {
             steps {
                 script {
                     gv.deployApp()
-                    echo "Application will be deployed to ${ENV}"
+                    echo "Application will be deployed to the ${ENV} environment"
                 }
             }
         }
