@@ -39,8 +39,8 @@ pipeline {
 
             script{
                 gv.buildApp()
-                echo "Final build version selection is ${Final Build Version}"
-                echo "Preferred cloud provider is ${Cloud Provider}"
+                echo "Final build version selection is ${'Final Build Version'}"
+                echo "Preferred cloud provider is ${'Cloud Provider'}"
 
             }
         }
