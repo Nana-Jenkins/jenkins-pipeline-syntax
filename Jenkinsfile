@@ -31,7 +31,7 @@ pipeline {
                 ok "Done, Build Version Selected"
                 parameters{
                     choice(name: 'Final Build Version', choices: ['2.7.8', '9.5.8', '7.0.0', '3.4.5'], description: 'Select build vers.')
-                    choice(name: 'Cloud Provider', choices: ['AWS', 'GCP', 'Azure', 'DigitalOcean'], description: 'Select cloud provd.')
+                    choice(name: 'Cloud_Provider', choices: ['AWS', 'GCP', 'Azure', 'DigitalOcean'], description: 'Select cloud provd.')
 
                 }
             }
@@ -39,8 +39,8 @@ pipeline {
 
             script{
                 gv.buildApp()
-                echo "Final build version selection is ${'Final Build Version'}"
-                echo "Preferred cloud provider is ${'Cloud Provider'}"
+                echo "Final build version selection is ${'Final Build Version'}" //important to remember to enclose with quotes any variable/strings that have spaces inside. Just like was done during the variable definition above.
+                echo "Preferred cloud provider is ${Cloud_Provider}"
 
             }
         }
