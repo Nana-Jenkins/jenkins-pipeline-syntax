@@ -1,70 +1,80 @@
 def gv
+//def gv = load 'script.groovy' //alternative approach to load groovy script before the pipeline starts execution
 
 pipeline {
     agent any
+    parameters {
+        choice(name: 'VERSION', choices: ['1.1.0', '1.2.0', '1.3.0'], description: 'select version to build')
+        booleanParam(name: 'Execute Tests Option', defaultValue: true, description: 'Test needed or not')
+
+    }
+    // environment{
+    //     NEW_VERSION = '1.3.4'
+    //     SERVER_CREDENTIALS = credentials('server-credentials')
+
+    // }
+
     tools {
-        maven 'Maven'
+        maven 'Maven-3.9'
     }
     stages {
-        stage('increment version') {
+        stage('init') {
             steps {
                 script {
-                    echo 'incrementing app version...'
-                    sh 'mvn build-helper:parse-version versions:set \
-                        -DnewVersion=\\\${parsedVersion.majorVersion}.\\\${parsedVersion.minorVersion}.\\\${parsedVersion.nextIncrementalVersion} \
-                        versions:commit'
-                    def matcher = readFile('pom.xml') =~ '<version>(.+)</version>'
-                    def version = matcher[0][1]
-                    env.IMAGE_NAME = "$version-$BUILD_NUMBER"
+                    gv = load "script.groovy"
                 }
             }
         }
-        stage('build app') {
+        stage('build') {
             steps {
-                script {
-                    echo 'building the application...'
-                    sh 'mvn clean package'
-                }
+
+            script{
+                gv.buildApp()
+
             }
         }
-        stage('build image') {
-            steps {
-                script {
-                    echo "building the docker image..."
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-repo', passwordVariable: 'PASS', usernameVariable: 'USER')]){
-                        sh "docker build -t nanatwn/demo-app:${IMAGE_NAME} ."
-                        sh 'echo $PASS | docker login -u $USER --password-stdin'
-                        sh "docker push nanatwn/demo-app:${IMAGE_NAME}"
+            }
+
+        }
+        stage('test') {
+            when{
+                expression{
+                params.'Execute Tests Option' == true
                     }
+                }
+            steps {
+
+                script {
+                    gv.testApp()
+
                 }
             }
         }
         stage('deploy') {
             steps {
                 script {
-                    echo 'deploying docker image...'
+                    gv.deployApp()
                 }
             }
         }
-        stage('commit version update'){
-            steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'gitlab-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]){
-                        sh 'git config --global user.email "jenkins@example.com"'
-                        sh 'git config --global user.name "jenkins"'
 
-                        sh 'git status'
-                        sh 'git branch'
-                        sh 'git config --list'
-
-                        sh "git remote set-url origin https://${USER}:${PASS}@gitlab.com/twn-devops-bootcamp/latest/08-jenkins/java-maven-app.git"
-                        sh 'git add .'
-                        sh 'git commit -m "ci: version bump"'
-                        sh 'git push origin HEAD:jenkins-jobs'
-                    }
-                }
-            }
-         }
         }
-    }
-}
+
+        // post{
+        //     always{
+        //         //always block is to be executed regardless of whether the build pass or failed
+
+
+        //     }
+
+        //     success{
+
+        //         //
+        //     }
+
+        //     failure{
+
+        //         //
+        //     }
+
+        // }
