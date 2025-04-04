@@ -1,5 +1,5 @@
 def gv
-//def gv = load 'script.groovy' //alternative approach to load groovy script before the pipeline starts execution
+//def gv = load 'script.groovy' //alternative approach to load groovy script before the pipeline starts execution. Although in practice, this approach is problematic and is better avoided until I know better.
 
 pipeline {
     agent any
